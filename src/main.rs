@@ -42,69 +42,69 @@ impl RustleGame {
             guesses: Vec::new(),
         }
     }
-}
 
-fn display_guesses(&mut self) {
-    self.guesses.iter().enumerate().for_each(|(guess_number, guess)| {
-        print!("{}: ", guess_number+1);
-        guess.chars().enumerate().for_each(|(pos, c)| {
-            let display = if self.word.chars().nth(pos).unwrap() == c {
-                format!("{c}").bright_green()
-            } else if self.word.chars().any(|wc| wc == c) {
-                format!("{c}").bright_yellow()
-            } else {
-                self.guessed_letters.insert(c);
-                format!("{c}").red()
-            };
-            print!("{display}");
-        });
-        println!();
-    })
-}
-
-fn display_invalid_letters(&self) {
-    if !self.guessed_letters.is_empty() {
-        print!("Letters not in the word: ");
-        self.guessed_letters.iter()
-            .for_each(|letter| print!("{letter} "));
-        println!();
+    fn display_guesses(&mut self) {
+        self.guesses.iter().enumerate().for_each(|(guess_number, guess)| {
+            print!("{}: ", guess_number+1);
+            guess.chars().enumerate().for_each(|(pos, c)| {
+                let display = if self.word.chars().nth(pos).unwrap() == c {
+                    format!("{c}").bright_green()
+                } else if self.word.chars().any(|wc| wc == c) {
+                    format!("{c}").bright_yellow()
+                } else {
+                    self.guessed_letters.insert(c);
+                    format!("{c}").red()
+                };
+                print!("{display}");
+            });
+            println!();
+        })
     }
-}
 
-fn ask_for_guess(&mut self) -> String {
-    println!(
-        "{}",
-        format!("Enter your word guess ({} letters) and press ENTER", WORD_LENGTH).cyan()
-    );
-    self.display_invalid_letters();
-    let mut guess = String::new();
-    let mut valid_guess = false;
-    while !valid_guess {
-        guess = String::new();
-        std::io::stdin().read_line(&mut guess).unwrap();
-        guess = sanitize_word(&guess);
-        if guess.len() != WORD_LENGTH {
-            println!("{}", format!("Your guess must be {} letters.", WORD_LENGTH).red())
-        } else if !self.dictionary.iter().any(|word| word==&guess) {
-            println!("{}", "{guess} isn't in the Rustle dictionary.".red())
-        } else {
-            self.guesses.push(guess.clone());
-            valid_guess = true;
+    fn display_invalid_letters(&self) {
+        if !self.guessed_letters.is_empty() {
+            print!("Letters not in the word: ");
+            self.guessed_letters.iter()
+                .for_each(|letter| print!("{letter} "));
+            println!();
         }
     }
-    guess
-}
 
-fn is_game_over(&self, guess: &str) -> bool {
-    let n_tries = self.guesses.len();
-    if guess == self.word {
-        println!("Correct! You guessed the word in {} tries.", n_tries);
-        true
-    } else if n_tries >= MAX_TRIES {
-        println!("{}", format!("You ran out of tries! The word was {}", self.word).bright_red());
-        true
-    } else {
-        false
+    fn ask_for_guess(&mut self) -> String {
+        println!(
+            "{}",
+            format!("Enter your word guess ({} letters) and press ENTER", WORD_LENGTH).cyan()
+        );
+        self.display_invalid_letters();
+        let mut guess = String::new();
+        let mut valid_guess = false;
+        while !valid_guess {
+            guess = String::new();
+            std::io::stdin().read_line(&mut guess).unwrap();
+            guess = sanitize_word(&guess);
+            if guess.len() != WORD_LENGTH {
+                println!("{}", format!("Your guess must be {} letters.", WORD_LENGTH).red())
+            } else if !self.dictionary.iter().any(|word| word==&guess) {
+                println!("{}", "{guess} isn't in the Rustle dictionary.".red())
+            } else {
+                self.guesses.push(guess.clone());
+                valid_guess = true;
+            }
+        }
+        guess
+    }
+
+    fn game_over(&self, guess: &str) -> bool {
+        let n_tries = self.guesses.len();
+        if guess == self.word {
+            println!("Correct! You guessed the word in {} tries.", n_tries);
+            true
+        } else if n_tries >= MAX_TRIES {
+            println!("{}", format!("You ran out of tries! The word was {}", self.word).bright_red());
+            true
+        } else {
+            false
+        }
     }
 }
 
