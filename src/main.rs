@@ -85,7 +85,7 @@ impl RustleGame {
             if guess.len() != WORD_LENGTH {
                 println!("{}", format!("Your guess must be {} letters.", WORD_LENGTH).red())
             } else if !self.dictionary.iter().any(|word| word==&guess) {
-                println!("{}", "{guess} isn't in the Rustle dictionary.".red())
+                println!("{}", format!("{} isn't in the Rustle dictionary.", guess).red())
             } else {
                 self.guesses.push(guess.clone());
                 valid_guess = true;
@@ -97,10 +97,11 @@ impl RustleGame {
     fn game_over(&self, guess: &str) -> bool {
         let n_tries = self.guesses.len();
         if guess == self.word {
-            println!("Correct! You guessed the word in {} tries.", n_tries);
+            println!("{}", format!("Correct! You guessed the word: '{}' successfully.", self.word).cyan());
+            println!("{}", format!("It took you {} tries.", n_tries).cyan());
             true
         } else if n_tries >= MAX_TRIES {
-            println!("{}", format!("You ran out of tries! The word was {}", self.word).bright_red());
+            println!("{}", format!("You ran out of tries! The word was: '{}'", self.word).bright_red());
             true
         } else {
             false
